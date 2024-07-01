@@ -43,3 +43,13 @@ func IsMeetRunning(meetUrl string) bool {
 
 	return false // No running processes with the meeting url.
 }
+
+func MonitorMeeting(meetUrl string, checkInterval int) {
+	time.Sleep(time.Duration(checkInterval) * time.Second)
+	if !IsMeetRunning(meetUrl) {
+		fmt.Println("Google meet is not running. Restarting at: ", time.Now())
+		StartMeeting(meetUrl)
+	} else {
+		fmt.Println("Google meet is running at ", time.Now())
+	}
+}
