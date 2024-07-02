@@ -27,11 +27,11 @@ func main() {
 		configYml.ChromeConfig.Xpath,
 	}
 
-	mtgH.StartMeeting(meetingUrl, chromeProfileDir, chromeDriverPath, seleniumPort, htmlIdentifiers)
+	mtgH.StartMeeting(meetingUrl, chromeProfileDir, chromeDriverPath, seleniumPort, htmlIdentifiers, endMeeting)
 
 	for !endMeeting {
 		endMeeting = ymlH.ParseYaml("config.yaml").MeetingInfo.EndMeeting
-		mtgH.MonitorMeeting(meetingUrl, chromeProfileDir, chromeDriverPath, seleniumPort, checkInterval, htmlIdentifiers)
+		mtgH.MonitorMeeting(meetingUrl, chromeProfileDir, chromeDriverPath, seleniumPort, checkInterval, htmlIdentifiers, endMeeting)
 	}
 
 }

@@ -19,7 +19,8 @@ type process struct {
 	CommandLine string
 }
 
-func StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath string, port int, htmlIdentifiers []string) {
+func StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath string,
+	port int, htmlIdentifiers []string, endMeeting bool) {
 	options := []selenium.ServiceOption{}
 	selenium.SetDebug(true)
 	service, err := selenium.NewChromeDriverService(chromeDriverPath, port, options...)
@@ -52,7 +53,14 @@ func StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath string, port int, 
 	if err != nil {
 		log.Fatalf("Error connecting to the webDriver: %v", err)
 	}
-	defer webDriver.Quit()
+	defer func() {
+		// Note: the third part pf the for is the update after every iteration.
+		for now := time.Now(); now.Hour() != 19 || !endMeeting; now = time.Now() {
+			time.Sleep(1 * time.Minute)
+		}
+		fmt.Printf("\nIt's 19:00, time to close the meeting.\n")
+		webDriver.Quit()
+	}()
 
 	if err := webDriver.Get(meetUrl); err != nil {
 		log.Fatalf("Error nevigating to the meeting's url: %v", err)
@@ -128,11 +136,11 @@ func IsMeetRunning(meetUrl string) bool {
 }
 
 func MonitorMeeting(meetUrl, chromeProfileDir, chromeDriverPath string,
-	port int, checkInterval int, htmlIdentifiers []string) {
+	port int, checkInterval int, htmlIdentifiers []string, endMeeting bool) {
 	time.Sleep(time.Duration(checkInterval) * time.Second)
 	if !IsMeetRunning(meetUrl) {
 		fmt.Println("Google meet is not running. Restarting at: ", time.Now())
-		StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath, port, htmlIdentifiers)
+		StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath, port, htmlIdentifiers, endMeeting)
 	} else {
 		fmt.Println("Google meet is running at ", time.Now())
 	}
