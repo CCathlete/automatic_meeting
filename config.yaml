@@ -5,5 +5,5 @@ Meeting info:
   end meeting?: false
 
 Browser config:
-  chrome driver path: /home/ccat/Downloads/chromedriver-linux64/chromedriver
+  chrome driver path: chromedriver_win64.exe
   port: 8181
