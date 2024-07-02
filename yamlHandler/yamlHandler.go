@@ -17,6 +17,9 @@ type BrowserConfig struct {
 	ChromeDriverPath string `yaml:"chrome driver path"`
 	ChromeProfileDir string `yaml:"chrome profile dir"`
 	Port             int    `yaml:"port"`
+	ClassId1         string `yaml:"class id 1"`
+	ClassId2         string `yaml:"class id 2"`
+	Xpath            string `yaml:"xpath"`
 }
 
 type Config struct {

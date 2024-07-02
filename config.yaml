@@ -8,3 +8,6 @@ Browser config:
   chrome driver path: chromedriver_win.exe
   chrome profile dir: .
   port: 8181
+  class id 1:
+  class id 2:
+  xpath:

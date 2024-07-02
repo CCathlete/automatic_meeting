@@ -19,7 +19,7 @@ type process struct {
 	CommandLine string
 }
 
-func StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath string, port int) {
+func StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath string, port int, htmlIdentifiers []string) {
 	options := []selenium.ServiceOption{}
 	selenium.SetDebug(true)
 	service, err := selenium.NewChromeDriverService(chromeDriverPath, port, options...)
@@ -61,14 +61,19 @@ func StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath string, port int) 
 	time.Sleep(5 * time.Second)
 
 	// Finding the join meeting button and clicking it.
-	class1Name := "VfPpkd-RLmnJb"
-	class2Name := "VfPpkd-vQzf8d"
+	class1Name := htmlIdentifiers[0]
+	class2Name := htmlIdentifiers[1]
+	xpath := htmlIdentifiers[2]
 	joinButton, err := webDriver.FindElement(selenium.ByClassName, class1Name)
 	if err != nil {
-		fmt.Printf("Couldn't find the button with the class name %s, trying another class name. Err: %v\n", class1Name, err)
+		fmt.Printf("\nCouldn't find the button with the class name %s, trying another class name. \nErr: %v\n", class1Name, err)
 		joinButton, err = webDriver.FindElement(selenium.ByClassName, class2Name)
 		if err != nil {
-			log.Fatalf("Couldn't find the button with the second class name %s. Err: %v\n", class2Name, err)
+			fmt.Printf("\nCouldn't find the button with the second class name %s, trying using xpath. \nErr: %v\n", class2Name, err)
+			joinButton, err = webDriver.FindElement(selenium.ByXPATH, xpath)
+		}
+		if err != nil {
+			log.Fatalf("\nCouldn't find the button with the xpath %s. \nErr: %v\n", class2Name, err)
 		}
 	}
 
@@ -76,12 +81,6 @@ func StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath string, port int) 
 		log.Fatalf("Error clicking the join button: %v", err)
 	}
 
-	// err = exec.Command("cmd", "/C", "start", meetUrl).Run()
-	// if err != nil {
-	// 	fmt.Printf("Failed to start the meeting with url: %s\n%v", meetUrl, err)
-	// } else {
-	// 	fmt.Printf("Google meet started at: %s", time.Now())
-	// }
 	fmt.Printf("Google meet started at: %s", time.Now())
 }
 
@@ -103,11 +102,12 @@ func IsMeetRunning(meetUrl string) bool {
 	return false // No running processes with the meeting url.
 }
 
-func MonitorMeeting(meetUrl, chromeProfileDir, chromeDriverPath string, port int, checkInterval int) {
+func MonitorMeeting(meetUrl, chromeProfileDir, chromeDriverPath string,
+	port int, checkInterval int, htmlIdentifiers []string) {
 	time.Sleep(time.Duration(checkInterval) * time.Second)
 	if !IsMeetRunning(meetUrl) {
 		fmt.Println("Google meet is not running. Restarting at: ", time.Now())
-		StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath, port)
+		StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath, port, htmlIdentifiers)
 	} else {
 		fmt.Println("Google meet is running at ", time.Now())
 	}
