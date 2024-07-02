@@ -10,6 +10,7 @@ import (
 type Meeting struct {
 	MeetingUrl    string `yaml:"url"`
 	CheckInterval int    `yaml:"check interval"`
+	EndMeeting    bool   `yaml:"end meeting?"`
 }
 
 type BrowserConfig struct {

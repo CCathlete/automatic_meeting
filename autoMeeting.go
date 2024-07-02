@@ -19,9 +19,13 @@ func main() {
 	checkInterval := configYml.MeetingInfo.CheckInterval
 	chromeDriverPath := configYml.ChromeConfig.ChromeDriverPath
 	seleniumPort := configYml.ChromeConfig.Port
+	endMeeting := configYml.MeetingInfo.EndMeeting
 
 	mtgH.StartMeeting(meetingUrl, chromeDriverPath, seleniumPort)
 
-	mtgH.MonitorMeeting(meetingUrl, chromeDriverPath, seleniumPort, checkInterval)
+	for !endMeeting {
+		endMeeting = ymlH.ParseYaml("config.yaml").MeetingInfo.EndMeeting
+		mtgH.MonitorMeeting(meetingUrl, chromeDriverPath, seleniumPort, checkInterval)
+	}
 
 }

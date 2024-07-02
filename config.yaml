@@ -2,6 +2,7 @@
 Meeting info:
   url: https://meet.google.com/xka-hogg-wye
   check interval: 60 # In seconds.
+  end meeting?: false
 
 Browser config:
   chrome driver path: /home/ccat/Downloads/chromedriver-linux64/chromedriver
