@@ -65,20 +65,45 @@ func StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath string, port int, 
 	class2Name := htmlIdentifiers[1]
 	xpath := htmlIdentifiers[2]
 	joinButton, err := webDriver.FindElement(selenium.ByClassName, class1Name)
-	if err != nil {
-		fmt.Printf("\nCouldn't find the button with the class name %s, trying another class name. \nErr: %v\n", class1Name, err)
-		joinButton, err = webDriver.FindElement(selenium.ByClassName, class2Name)
-		if err != nil {
-			fmt.Printf("\nCouldn't find the button with the second class name %s, trying using xpath. \nErr: %v\n", class2Name, err)
-			joinButton, err = webDriver.FindElement(selenium.ByXPATH, xpath)
-		}
-		if err != nil {
-			log.Fatalf("\nCouldn't find the button with the xpath %s. \nErr: %v\n", class2Name, err)
+	var err2 error
+	if err == nil {
+		// class 1 was found so we're trying to click it.
+		err2 = joinButton.Click()
+		if err2 != nil {
+			fmt.Printf("Error clicking the join button with class 1 %s, trying class 2: %v", class1Name, err)
 		}
 	}
-
-	if err := joinButton.Click(); err != nil {
-		log.Fatalf("Error clicking the join button: %v", err)
+	if err != nil || err2 != nil {
+		// class 1 wasn't found or wasn't clickable so we're trying class 2.
+		if err != nil {
+			fmt.Printf("\nCouldn't find the button with the class name %s, trying another class name. \nErr: %v\n", class1Name, err)
+		}
+		joinButton, err = webDriver.FindElement(selenium.ByClassName, class2Name)
+		if err == nil {
+			// class 2 was found so we're trying to click it.
+			err2 = joinButton.Click()
+			if err2 != nil {
+				fmt.Printf("Error clicking the join button with class 2 %s, trying xpath: %v", class2Name, err)
+			}
+		}
+		if err != nil || err2 != nil {
+			// class 2 wasn't found or wasn't clickable so we're trying xpath.
+			if err != nil {
+				fmt.Printf("\nCouldn't find the button with the second class name %s, trying using xpath. \nErr: %v\n", class2Name, err)
+			}
+			joinButton, err = webDriver.FindElement(selenium.ByXPATH, xpath)
+			if err == nil {
+				// xpath was found so we're trying to click it.
+				err2 = joinButton.Click()
+				if err2 != nil {
+					log.Fatalf("Error clicking the join button using xpath %s: %v", xpath, err)
+				}
+			}
+		}
+		if err != nil {
+			// xpath wasn't found.
+			log.Fatalf("\nCouldn't find the button with the xpath %s. \nErr: %v\n", xpath, err)
+		}
 	}
 
 	fmt.Printf("Google meet started at: %s", time.Now())
