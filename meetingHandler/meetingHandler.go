@@ -6,7 +6,6 @@ package meetinghandler
 import (
 	"fmt"
 	"log"
-	"os/exec"
 	"strings"
 	"time"
 
@@ -46,14 +45,28 @@ func StartMeeting(meetUrl string, chromeDriverPath string, port int) {
 	time.Sleep(5 * time.Second)
 
 	// Finding the join meeting button and clicking it.
-	joinButton, err := webDriver.FindElement(selenium.ByCSSSelector, "")
-
-	err = exec.Command("cmd", "/C", "start", meetUrl).Run()
+	class1Name := "VfPpkd-RLmnJb"
+	class2Name := "VfPpkd-vQzf8d"
+	joinButton, err := webDriver.FindElement(selenium.ByClassName, class1Name)
 	if err != nil {
-		fmt.Printf("Failed to start the meeting with url: %s\n%v", meetUrl, err)
-	} else {
-		fmt.Printf("Google meet started at: %s", time.Now())
+		fmt.Printf("Couldn't find the button with the class name %s, trying another class name. Err: %v\n", class1Name, err)
+		joinButton, err = webDriver.FindElement(selenium.ByClassName, class2Name)
+		if err != nil {
+			log.Fatalf("Couldn't find the button with the second class name %s. Err: %v\n", class2Name, err)
+		}
 	}
+
+	if err := joinButton.Click(); err != nil {
+		log.Fatalf("Error clicking the join button: %v", err)
+	}
+
+	// err = exec.Command("cmd", "/C", "start", meetUrl).Run()
+	// if err != nil {
+	// 	fmt.Printf("Failed to start the meeting with url: %s\n%v", meetUrl, err)
+	// } else {
+	// 	fmt.Printf("Google meet started at: %s", time.Now())
+	// }
+	fmt.Printf("Google meet started at: %s", time.Now())
 }
 
 func IsMeetRunning(meetUrl string) bool {
