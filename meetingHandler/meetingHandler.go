@@ -17,7 +17,7 @@ type process struct {
 	CommandLine string
 }
 
-func StartMeeting(meetUrl string) {
+func StartMeeting(meetUrl string, chromeDriverPath string, port int) {
 	err := exec.Command("cmd", "/C", "start", meetUrl).Run()
 	if err != nil {
 		fmt.Printf("Failed to start the meeting with url: %s\n%v", meetUrl, err)
@@ -44,11 +44,11 @@ func IsMeetRunning(meetUrl string) bool {
 	return false // No running processes with the meeting url.
 }
 
-func MonitorMeeting(meetUrl string, checkInterval int) {
+func MonitorMeeting(meetUrl string, chromeDriverPath string, port int, checkInterval int) {
 	time.Sleep(time.Duration(checkInterval) * time.Second)
 	if !IsMeetRunning(meetUrl) {
 		fmt.Println("Google meet is not running. Restarting at: ", time.Now())
-		StartMeeting(meetUrl)
+		StartMeeting(meetUrl, chromeDriverPath, port)
 	} else {
 		fmt.Println("Google meet is running at ", time.Now())
 	}

@@ -12,8 +12,14 @@ type Meeting struct {
 	CheckInterval int    `yaml:"check interval"`
 }
 
+type BrowserConfig struct {
+	ChromeDriverPath string `yaml:"chrome driver path"`
+	Port             int    `yaml:"port"`
+}
+
 type Config struct {
-	MeetingInfo Meeting `yaml:"Meeting info"`
+	MeetingInfo  Meeting       `yaml:"Meeting info"`
+	ChromeConfig BrowserConfig `yaml:"Browser config"`
 }
 
 func ParseYaml(yamlPath string) Config {
