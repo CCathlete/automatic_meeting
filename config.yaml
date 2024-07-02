@@ -5,5 +5,5 @@ Meeting info:
   end meeting?: false
 
 Browser config:
-  chrome driver path: chromedriver_win64.exe
+  chrome driver path: chromedriver_win.exe
   port: 8181
