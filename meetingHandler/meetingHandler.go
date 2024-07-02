@@ -5,11 +5,13 @@ package meetinghandler
 
 import (
 	"fmt"
+	"log"
 	"os/exec"
 	"strings"
 	"time"
 
 	"github.com/StackExchange/wmi"
+	"github.com/tebeka/selenium"
 )
 
 type process struct {
@@ -18,7 +20,35 @@ type process struct {
 }
 
 func StartMeeting(meetUrl string, chromeDriverPath string, port int) {
-	err := exec.Command("cmd", "/C", "start", meetUrl).Run()
+	options := []selenium.ServiceOption{}
+	selenium.SetDebug(true)
+	service, err := selenium.NewChromeDriverService(chromeDriverPath, port, options...)
+	if err != nil {
+		log.Fatalf("Couldn't start the ChromeDriver service: %v", err)
+	}
+	defer service.Stop()
+
+	capabilities := selenium.Capabilities{
+		"browserName": "chrome",
+	}
+	seleniumServerUrl := fmt.Sprintf("http://localhost:%d/wd/hub", port)
+	// Starting a new session.
+	webDriver, err := selenium.NewRemote(capabilities, seleniumServerUrl)
+	if err != nil {
+		log.Fatalf("Error connecting to the webDriver: %v", err)
+	}
+	defer webDriver.Quit()
+
+	if err := webDriver.Get(meetUrl); err != nil {
+		log.Fatalf("Error nevigating to the meeting's url: %v", err)
+	}
+	// Waiting for the page to load.
+	time.Sleep(5 * time.Second)
+
+	// Finding the join meeting button and clicking it.
+	joinButton, err := webDriver.FindElement(selenium.ByCSSSelector, "")
+
+	err = exec.Command("cmd", "/C", "start", meetUrl).Run()
 	if err != nil {
 		fmt.Printf("Failed to start the meeting with url: %s\n%v", meetUrl, err)
 	} else {
