@@ -15,6 +15,7 @@ type Meeting struct {
 
 type BrowserConfig struct {
 	ChromeDriverPath string `yaml:"chrome driver path"`
+	ChromeProfileDir string `yaml:"chrome profile dir"`
 	Port             int    `yaml:"port"`
 }
 

@@ -11,6 +11,7 @@ import (
 
 	"github.com/StackExchange/wmi"
 	"github.com/tebeka/selenium"
+	"github.com/tebeka/selenium/chrome"
 )
 
 type process struct {
@@ -18,7 +19,7 @@ type process struct {
 	CommandLine string
 }
 
-func StartMeeting(meetUrl string, chromeDriverPath string, port int) {
+func StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath string, port int) {
 	options := []selenium.ServiceOption{}
 	selenium.SetDebug(true)
 	service, err := selenium.NewChromeDriverService(chromeDriverPath, port, options...)
@@ -27,8 +28,23 @@ func StartMeeting(meetUrl string, chromeDriverPath string, port int) {
 	}
 	defer service.Stop()
 
+	chromeOptions := chrome.Capabilities{
+		Args: []string{
+			"--disable-gpu",
+			"--disable-extensions",
+			"--disable-dev-shm-usage",
+			"--no-sandbox",
+			"--disable-infobars",
+			"--start-maximized",
+			"--disable-browser-side-navigation",
+			"--disable-blink-features=AutomationControlled",
+			fmt.Sprintf("--user-data-dir=%s", chromeProfileDir),
+		},
+	}
+
 	capabilities := selenium.Capabilities{
-		"browserName": "chrome",
+		"browserName":   "chrome",
+		"chromeOptions": chromeOptions,
 	}
 	seleniumServerUrl := fmt.Sprintf("http://localhost:%d/wd/hub", port)
 	// Starting a new session.
@@ -87,11 +103,11 @@ func IsMeetRunning(meetUrl string) bool {
 	return false // No running processes with the meeting url.
 }
 
-func MonitorMeeting(meetUrl string, chromeDriverPath string, port int, checkInterval int) {
+func MonitorMeeting(meetUrl, chromeProfileDir, chromeDriverPath string, port int, checkInterval int) {
 	time.Sleep(time.Duration(checkInterval) * time.Second)
 	if !IsMeetRunning(meetUrl) {
 		fmt.Println("Google meet is not running. Restarting at: ", time.Now())
-		StartMeeting(meetUrl, chromeDriverPath, port)
+		StartMeeting(meetUrl, chromeProfileDir, chromeDriverPath, port)
 	} else {
 		fmt.Println("Google meet is running at ", time.Now())
 	}

@@ -6,4 +6,5 @@ Meeting info:
 
 Browser config:
   chrome driver path: chromedriver_win.exe
+  chrome profile dir: .
   port: 8181
